@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <random>
 #include <chrono>
+#include <cmath>
 
 using namespace std;
 
@@ -17,7 +18,7 @@ void copyArray(int[], int[], int);
 
 int main(int argc, char* argv[])
 {
-    int arrSize = 10000;
+    const int arrSize = 10000;
     int array[arrSize];
     int bubbleArray[arrSize];
     int selectionArray[arrSize];
@@ -100,7 +101,8 @@ void merge(int array[], int p, int q, int r)
     int n1 = q - p + 1;
     int n2 = r - q;
 
-    int L[n1], M[n2];
+    int* L = (int*) malloc(sizeof(int) * n1);
+    int* M = (int*) malloc(sizeof(int) * n2);
 
     for (int i = 0; i < n1; i++)
     {
@@ -149,7 +151,7 @@ void mergeSort(int array[], int l, int r)
     
     if(l < r)
     {
-        int m = l + (r - 1)/2;
+        int m = l + (r - l - 1)/2;
         mergeSort(array, l, m);
         mergeSort(array, m + 1, r);
         
