@@ -6,6 +6,7 @@
 using namespace std;
 
 #define USE_IMPROVED true
+#define BOGO true
 
 void buildArray(int[], int);
 void bubbleSort(int[], int);
@@ -14,18 +15,21 @@ void insertionSort(int[], int);
 void betterMergeSort(int* array, int size);
 void mergeSort(int[], int, int);
 void merge(int[], int, int, int);
+void bogoSort(int* array, int size);
+void randomize(int* array, int size);
 
 void printArray(int[], int);
 void copyArray(int[], int[], int);
 
 int main(int argc, char* argv[])
 {
-    const int arrSize = 100000;
+    const int arrSize = 13;
     int array[arrSize];
     int bubbleArray[arrSize];
     int selectionArray[arrSize];
     int insertionArray[arrSize];
     int mergeArray[arrSize];
+    int bogoArray[arrSize];
 
     cout << "Building array..." << endl;
     buildArray(array, arrSize);
@@ -33,7 +37,7 @@ int main(int argc, char* argv[])
 
     auto start = chrono::system_clock::now();
     cout << "Bubble Sorting array..." << endl;
-    // bubbleSort(bubbleArray, arrSize);
+    bubbleSort(bubbleArray, arrSize);
     auto end = chrono::system_clock::now();
     auto elapsed = end - start;
     cout << "Bubble Sort: " << elapsed.count() << '\n';
@@ -42,7 +46,7 @@ int main(int argc, char* argv[])
     start = chrono::system_clock::now();
     cout << "Selection Sorting array..." << endl;
     copyArray(array, selectionArray, arrSize);
-    // selectionSort(selectionArray, arrSize);
+    selectionSort(selectionArray, arrSize);
     end = chrono::system_clock::now();
     elapsed = end - start;
     cout << "Selection Sort: " << elapsed.count() << '\n';
@@ -50,7 +54,7 @@ int main(int argc, char* argv[])
     start = chrono::system_clock::now();
     cout << "Insertion Sorting array..." << endl;
     copyArray(array, insertionArray, arrSize);
-    // insertionSort(insertionArray, arrSize);
+    insertionSort(insertionArray, arrSize);
     end = chrono::system_clock::now();
     elapsed = end - start;
     cout << "Selection Sort: " << elapsed.count() << '\n';
@@ -61,21 +65,31 @@ int main(int argc, char* argv[])
 
     start = chrono::system_clock::now();
     cout << "Merge Sorting array..." << endl;
-    
     copyArray(array, mergeArray, arrSize);
     #if USE_IMPROVED
-    betterMergeSort(mergeArray, arrSize);
+        betterMergeSort(mergeArray, arrSize);
     #else
-    mergeSort(mergeArray, l, r);
+        mergeSort(mergeArray, l, r);
     #endif
-
     end = chrono::system_clock::now();
     elapsed = end - start;
     cout << "Merge Sort: " << elapsed.count() << '\n';
+
+    start = chrono::system_clock::now();
+    cout << "Bogo Sorting array..." << endl;
+    copyArray(array, bogoArray, arrSize);
+    #if BOGO
+        bogoSort(bogoArray, arrSize);
+    #endif
+    end = chrono::system_clock::now();
+    elapsed = end - start;
+    cout << "Bogo Sort: " << elapsed.count() << '\n';
+    
     // printArray(bubbleArray, arrSize);
     // printArray(selectionArray, arrSize);
     // printArray(insertionArray, arrSize);
-    // printArray(mergeArray, arrSize);
+    printArray(mergeArray, arrSize);
+    printArray(bogoArray, arrSize);
     return 0;
 }
 
@@ -169,13 +183,12 @@ void mergeSort(int array[], int l, int r)
 }
 
 void betterMergeSort(int* array, int size) {
-    int maxStep = size/2;
     int step = 1; // ideal size of a "chunk"
     int s1, s2; // actual size of chunk
     int s1i, s2i; // where located within chunk
     int* buffer = (int*) malloc(sizeof(int) * size);
 
-    while (step <= maxStep) {
+    while (step < size) {
         for (int i = 0; i < size; i += 2*step) {
             // get size of next two chunks
             if (i + step < size) {
@@ -210,10 +223,42 @@ void betterMergeSort(int* array, int size) {
 
             // shove buffer back into array
             for (int j = s1 + s2 - 1; j >= 0; j--) { array[i+j] = buffer[j]; }
+
+            printArray(buffer, step);
         }
         step *= 2;
     }
     free(buffer);
+}
+
+void bogoSort(int* array, int size) {
+    bool isSorted = false;
+    int last;
+    while (!isSorted) {
+        randomize(array, size);
+
+
+        last = array[0];
+        isSorted = true;
+        for (int i = 1; i < size; i++) {
+            if (last > array[i]) {
+                isSorted = false;
+                break;
+            }
+            last = array[i];
+        }
+    }
+}
+
+void randomize(int* array, int size) {
+    int temp;
+    int swapI;
+    for (int i = size-1; i > 0; i--) {
+        swapI = rand() % i;
+        temp = array[i];
+        array[i] = array[swapI];
+        array[swapI] = temp;
+    }
 }
 
 void insertionSort(int array[], int arrSize)
